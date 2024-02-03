@@ -30,4 +30,4 @@ Route::controller(UserController::class)->group(function() {
 })->middleware('auth:api');
 
 
-Route::apiResource('players', PlayersController::class)->middleware('auth:api');
+Route::apiResource('player', PlayersController::class)->middleware('auth:api');

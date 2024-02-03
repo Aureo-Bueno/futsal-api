@@ -60,3 +60,30 @@ A seguir estão os endpoints disponíveis e exemplos de requisições para a sua
     "password": 123456
   }
   ```
+
+### 1.2 Get User
+
+- **Método:** POST
+- **Endpoint:** http://127.0.0.1:8000/api/user
+- **Requisito:** Adicionar o token ao cabeçalho como Bearer.
+
+
+## 2. Player
+
+### 2.1 Get Players
+
+- **Método:** GET
+- **Endpoint:** http://127.0.0.1:8000/api/player
+- **Requisito:** Adicionar o token ao cabeçalho como Bearer.
+
+### 2.2 Create Players
+
+- **Método:** POST
+- **Endpoint:** http://127.0.0.1:8000/api/player
+- **Requisito:** Adicionar o token ao cabeçalho como Bearer.
+  ```json
+  {
+    "name": "example",
+    "jersey_number": 01
+  }
+  ```
