@@ -40,8 +40,27 @@ docker run -d --name futsal-mysql -e MYSQL_ROOT_PASSWORD=futsal2024 -e MYSQL_DAT
 1. Clone o repositório para sua máquina local:
 
 ```
+composer install
+```
+
+1. Clone o repositório para sua máquina local:
+
+```
+php artisan passport:keys
+```
+
+1. Clone o repositório para sua máquina local:
+
+```
+php artisan migrate
+```
+
+1. Clone o repositório para sua máquina local:
+
+```
 php artisan serve
 ```
+
 
 # API Endpoints and Requests
 
