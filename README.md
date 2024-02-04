@@ -58,6 +58,12 @@ php artisan migrate
 1. Clone o repositório para sua máquina local:
 
 ```
+php artisan db:seed
+```
+
+1. Clone o repositório para sua máquina local:
+
+```
 php artisan serve
 ```
 

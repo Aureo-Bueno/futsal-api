@@ -10,12 +10,14 @@ return new class extends Migration {
    */
   public function up(): void
   {
-    Schema::create('players', function (Blueprint $table) {
+    Schema::create('team_match', function (Blueprint $table) {
       $table->uuid('id')->primary();
-      $table->string('name');
-      $table->integer('jersey_number');
+      $table->date('date_team_match');
+      $table->string('start_time');
+      $table->string('end_time');
+      $table->string('scoreboard');
       $table->timestamps();
-  });
+    });
   }
 
   /**
@@ -23,6 +25,6 @@ return new class extends Migration {
    */
   public function down(): void
   {
-    Schema::dropIfExists('players');
+    Schema::dropIfExists('team_match');
   }
 };

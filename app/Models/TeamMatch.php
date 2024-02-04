@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Players extends Model
+class TeamMatch extends Model
 {
   use HasUuids;
   /**
@@ -14,7 +14,7 @@ class Players extends Model
    *
    * @var string
    */
-  protected $table = 'players';
+  protected $table = 'team_match';
 
   /**
    * The primary key associated with the table.
@@ -44,13 +44,17 @@ class Players extends Model
    */
   protected $fillable = [
     'id',
-    'name',
-    'jersey_number',
-    'team_id',
+    'date_team_match',
+    'start_time',
+    'end_time',
+    'scoreboard',
   ];
 
-  public function team(): BelongsTo
+  /**
+   * Get the teams for the team match.
+   */
+  public function teams(): HasMany
   {
-    return $this->belongsTo(Team::class);
+    return $this->hasMany(Team::class, 'foreign_key');
   }
 }

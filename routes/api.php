@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\PlayersController;
+use App\Http\Controllers\TeamClassificationController;
+use App\Http\Controllers\TeamController;
+use App\Http\Controllers\TeamMatchController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -26,8 +29,26 @@ Route::controller(UserController::class)->group(function() {
 
 Route::controller(UserController::class)->group(function() {
   Route::post('user', 'getUser');
-  Route::post('logout', 'userLogout');
+  Route::post('user', 'userLogout');
 })->middleware('auth:api');
 
+Route::controller(PlayersController::class)->group(function() {
+  Route::get('player', 'index');
+  Route::post('player', 'store');
+})->middleware('auth:api');
 
-Route::apiResource('player', PlayersController::class)->middleware('auth:api');
+Route::controller(TeamController::class)->group(function() {
+  Route::get('team', 'index');
+  Route::post('team', 'store');
+  Route::put('team', 'update');
+})->middleware('auth:api');
+
+Route::controller(TeamClassificationController::class)->group(function() {
+  Route::get('teamClassification', 'index');
+})->middleware('auth:api');
+
+Route::controller(TeamMatchController::class)->group(function() {
+  Route::get('teamMatch', 'index');
+  Route::post('teamMatch', 'store');
+})->middleware('auth:api');
+

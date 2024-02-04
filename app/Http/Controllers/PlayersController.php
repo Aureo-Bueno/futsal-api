@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Players;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class PlayersController extends Controller
 {
@@ -13,10 +16,14 @@ class PlayersController extends Controller
    *
    * @return \Illuminate\Http\JsonResponse
    */
-  public function index()
+  public function index(): JsonResponse
   {
-    $players = Players::all();
-    return response()->json(['status' => 200, 'players' => $players], 200);
+    if (Auth::guard('api')->check()) {
+      $players = Players::all();
+      return response()->json(['status' => 200, 'players' => $players], 200);
+    }
+
+    return response()->json(['status' => 401, 'message' => 'Unauthorized'], 401);
   }
 
   /**
@@ -25,27 +32,25 @@ class PlayersController extends Controller
    * @param  \Illuminate\Http\Request  $request
    * @return \Illuminate\Http\JsonResponse
    */
-  public function store(Request $request)
+  public function store(Request $request): JsonResponse
   {
-    $request->validate([
-      'name' => 'required',
-      'jersey_number' => 'required|numeric',
-    ]);
+    if (Auth::guard('api')->check()) {
+      $validated = $request->validate([
+        'name' => 'required|string',
+        'jersey_number' => 'required|numeric',
+        'team_id' => 'required|uuid',
+      ]);
 
-    $player = Players::create($request->all());
+      if ($validated) {
+        $player = Players::create($validated);
 
-    return response()->json(['status' => 200, 'player' => $player], 200);
-  }
+        return response()->json(['status' => 200, 'player' => $player], 200);
+      }
 
-  /**
-   * Display the specified resource.
-   *
-   * @param  \App\Models\Players  $player
-   * @return \Illuminate\Http\JsonResponse
-   */
-  public function show(Players $player)
-  {
-    return response()->json(['player' => $player]);
+      return response()->json(['status' => 422, 'message' => 'Bad Entity'], 422);
+    }
+
+    return response()->json(['status' => 401, 'message' => 'Unauthorized'], 401);
   }
 
   /**
@@ -57,13 +62,17 @@ class PlayersController extends Controller
    */
   public function update(Request $request, Players $player)
   {
-    $request->validate([
-      'name' => 'required',
-      'jersey_number' => 'required|numeric',
-    ]);
+    if (Auth::guard('api')->check()) {
+      $request->validate([
+        'name' => 'required',
+        'jersey_number' => 'required|numeric',
+      ]);
 
-    $player->update($request->all());
+      $player->update($request->all());
 
-    return response()->json(['status' => 200, 'player' => $player], 200);
+      return response()->json(['status' => 200, 'player' => $player], 200);
+    }
+
+    return response()->json(['status' => 401, 'message' => 'Unauthorized'], 401);
   }
 }

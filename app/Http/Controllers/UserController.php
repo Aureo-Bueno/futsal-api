@@ -19,7 +19,6 @@ class UserController extends Controller
 
     Auth::attempt($input);
     $user = Auth::user();
-
     $token = $user->createToken('example')->accessToken;
     return Response(['status' => 200, 'token' => $token], 200);
   }
