@@ -7,15 +7,15 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
   public function up()
   {
-    Schema::table('teams', function (Blueprint $table) {
-      $table->uuid('team_match_id')->after('name');
+    Schema::table('players', function (Blueprint $table) {
+      $table->foreign('team_id')->references('id')->on('teams');
     });
   }
 
   public function down()
   {
-    Schema::table('teams', function (Blueprint $table) {
-      $table->dropColumn('team_match_id');
+    Schema::table('players', function (Blueprint $table) {
+      $table->dropColumn('team_id');
     });
   }
 };

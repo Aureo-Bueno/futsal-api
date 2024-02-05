@@ -54,25 +54,24 @@ class PlayersController extends Controller
   }
 
   /**
-   * Update the specified resource in storage.
+   * Update a player.
    *
-   * @param  \Illuminate\Http\Request  $request
-   * @param  \App\Models\Players  $player
+   *
    * @return \Illuminate\Http\JsonResponse
    */
-  public function update(Request $request, Players $player)
+  public function update(Request $request, $id): JsonResponse
   {
     if (Auth::guard('api')->check()) {
-      $request->validate([
-        'name' => 'required',
-        'jersey_number' => 'required|numeric',
-      ]);
-
-      $player->update($request->all());
+      $player = Players::find($id);
+      $player->name = $request->input('name');
+      $player->jersey_number = $request->input('jersey_number');
+      $player->team_id = $request->input('team_id');
+      $player->save();
 
       return response()->json(['status' => 200, 'player' => $player], 200);
     }
 
     return response()->json(['status' => 401, 'message' => 'Unauthorized'], 401);
+
   }
 }

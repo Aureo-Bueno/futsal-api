@@ -47,4 +47,25 @@ class TeamController extends Controller
 
     return response()->json(['status' => 401, 'message' => 'Unauthorized'], 401);
   }
+
+  /**
+   * Update a team.
+   *
+   *
+   * @return \Illuminate\Http\JsonResponse
+   */
+  public function update(Request $request, $id): JsonResponse
+  {
+    if (Auth::guard('api')->check()) {
+      $team = Team::find($id);
+      $team->name = $request->input('name');
+      $team->team_match_id = $request->input('team_match_id');
+      $team->save();
+
+      return response()->json(['status' => 200, 'team' => $team], 200);
+    }
+
+    return response()->json(['status' => 401, 'message' => 'Unauthorized'], 401);
+
+  }
 }

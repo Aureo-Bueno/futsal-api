@@ -11,7 +11,7 @@ return new class extends Migration {
       $table->uuid('id')->primary();
       $table->string('name');
       $table->integer('jersey_number');
-      $table->uuid('team_id');
+      $table->uuid('team_id')->nullable();
       $table->timestamps();
     });
   }

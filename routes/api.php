@@ -35,12 +35,13 @@ Route::controller(UserController::class)->group(function() {
 Route::controller(PlayersController::class)->group(function() {
   Route::get('player', 'index');
   Route::post('player', 'store');
+  Route::post('player', 'update');
 })->middleware('auth:api');
 
 Route::controller(TeamController::class)->group(function() {
   Route::get('team', 'index');
   Route::post('team', 'store');
-  Route::put('team', 'update');
+  Route::put('team/{id}', 'update');
 })->middleware('auth:api');
 
 Route::controller(TeamClassificationController::class)->group(function() {
@@ -50,5 +51,6 @@ Route::controller(TeamClassificationController::class)->group(function() {
 Route::controller(TeamMatchController::class)->group(function() {
   Route::get('teamMatch', 'index');
   Route::post('teamMatch', 'store');
+  Route::put('teamMatch/{id}', 'update');
 })->middleware('auth:api');
 
