@@ -3,28 +3,37 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Request;
 use Throwable;
 
 class Handler extends ExceptionHandler
 {
-    /**
-     * The list of the inputs that are never flashed to the session on validation exceptions.
-     *
-     * @var array<int, string>
-     */
-    protected $dontFlash = [
-        'current_password',
-        'password',
-        'password_confirmation',
-    ];
+  /**
+   * The list of the inputs that are never flashed to the session on validation exceptions.
+   *
+   * @var array<int, string>
+   */
+  protected $dontFlash = [
+    'current_password',
+    'password',
+    'password_confirmation',
+  ];
 
-    /**
-     * Register the exception handling callbacks for the application.
-     */
-    public function register(): void
-    {
-        $this->reportable(function (Throwable $e) {
-            //
-        });
-    }
+  /**
+   * Register the exception handling callbacks for the application.
+   */
+  public function register(): void
+  {
+    $this->reportable(function (Throwable $e) {
+      //
+    });
+  }
+
+  /**
+   * Force JSON responses for API routes.
+   */
+  protected function shouldReturnJson($request, Throwable $e): bool
+  {
+    return $request instanceof Request && ($request->expectsJson() || $request->is('api/*'));
+  }
 }

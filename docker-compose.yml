@@ -1,0 +1,43 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: futsal-app
+    ports:
+      - "8000:80"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8000
+      LOG_CHANNEL: stderr
+      LOG_LEVEL: debug
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: futsal_db
+      DB_USERNAME: aureo_admin
+      DB_PASSWORD: aureo@2024
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:17
+    container_name: futsal-postgres
+    environment:
+      POSTGRES_DB: futsal_db
+      POSTGRES_USER: aureo_admin
+      POSTGRES_PASSWORD: aureo@2024
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

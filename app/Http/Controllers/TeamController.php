@@ -2,70 +2,177 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Team;
+use App\Http\Requests\TeamStoreRequest;
+use App\Http\Requests\TeamUpdateRequest;
+use App\Http\Resources\TeamResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use OpenApi\Annotations as OA;
+use App\Services\Contracts\TeamServiceInterface;
 
+/**
+ * Handle team endpoints.
+ */
 class TeamController extends Controller
 {
-  /**
-   * Display a listing of the resource.
-   *
-   * @return \Illuminate\Http\JsonResponse
-   */
-  public function index(): JsonResponse
-  {
-    if (Auth::guard('api')->check()) {
-      $team = Team::all();
-      return response()->json(['status' => 200, 'teams' => $team], 200);
-    }
-
-    return response()->json(['status' => 401, 'message' => 'Unauthorized'], 401);
+  public function __construct(
+    private readonly TeamServiceInterface $teamService
+  ) {
   }
 
   /**
-   * Create a new team.
+   * List teams.
    *
-   * @return \Illuminate\Http\JsonResponse
+   * @OA\Get(
+   *   path="/api/team",
+   *   tags={"Teams"},
+   *   summary="List teams",
+   *   security={{"bearerAuth":{}}},
+   *   @OA\Response(response=200, description="OK"),
+   *   @OA\Response(response=401, description="Unauthorized")
+   * )
    */
-  public function store(Request $request): JsonResponse
+  public function index(Request $request): JsonResponse
   {
-    if (Auth::guard('api')->check()) {
-      $validated = $request->validate([
-        'name' => 'required|string',
-      ]);
+    $perPage = (int) $request->query('per_page', 15);
+    $perPage = max(1, min(100, $perPage));
 
-      if ($validated) {
-        $team = Team::create($validated);
+    $teams = $this->teamService->paginate($perPage);
+    return TeamResource::collection($teams)->additional(['status' => 200])->response()->setStatusCode(200);
+  }
 
-        return response()->json(['status' => 200, 'team' => $team], 200);
-      }
-
-      return response()->json(['status' => 422, 'message' => 'Bad Entity'], 422);
+  /**
+   * Get a team by id.
+   *
+   * @OA\Get(
+   *   path="/api/team/{id}",
+   *   tags={"Teams"},
+   *   summary="Get team",
+   *   security={{"bearerAuth":{}}},
+   *   @OA\Parameter(
+   *     name="id",
+   *     in="path",
+   *     required=true,
+   *     @OA\Schema(type="string")
+   *   ),
+   *   @OA\Response(response=200, description="OK"),
+   *   @OA\Response(response=404, description="Not Found"),
+   *   @OA\Response(response=401, description="Unauthorized")
+   * )
+   */
+  public function show(string $id): JsonResponse
+  {
+    $team = $this->teamService->get($id);
+    if (!$team) {
+      return response()->json(['status' => 404, 'message' => 'Not Found'], 404);
     }
 
-    return response()->json(['status' => 401, 'message' => 'Unauthorized'], 401);
+    return (new TeamResource($team))
+      ->additional(['status' => 200])
+      ->response()
+      ->setStatusCode(200);
+  }
+
+  /**
+   * Create a team.
+   *
+   * @OA\Post(
+   *   path="/api/team",
+   *   tags={"Teams"},
+   *   summary="Create team",
+   *   security={{"bearerAuth":{}}},
+   *   @OA\RequestBody(
+   *     required=true,
+   *     @OA\JsonContent(
+   *       required={"name"},
+   *       @OA\Property(property="name", type="string")
+   *     )
+   *   ),
+   *   @OA\Response(response=200, description="OK"),
+   *   @OA\Response(response=401, description="Unauthorized"),
+   *   @OA\Response(response=422, description="Validation error")
+   * )
+   */
+  public function store(TeamStoreRequest $request): JsonResponse
+  {
+    $validated = $request->validated();
+
+    $team = $this->teamService->create($validated);
+
+    return (new TeamResource($team))
+      ->additional(['status' => 201])
+      ->response()
+      ->setStatusCode(201);
   }
 
   /**
    * Update a team.
    *
-   *
-   * @return \Illuminate\Http\JsonResponse
+   * @OA\Put(
+   *   path="/api/team/{id}",
+   *   tags={"Teams"},
+   *   summary="Update team",
+   *   security={{"bearerAuth":{}}},
+   *   @OA\Parameter(
+   *     name="id",
+   *     in="path",
+   *     required=true,
+   *     @OA\Schema(type="string")
+   *   ),
+   *   @OA\RequestBody(
+   *     required=true,
+   *     @OA\JsonContent(
+   *       required={"name","team_match_id"},
+   *       @OA\Property(property="name", type="string"),
+   *       @OA\Property(property="team_match_id", type="string", format="uuid")
+   *     )
+   *   ),
+   *   @OA\Response(response=200, description="OK"),
+   *   @OA\Response(response=401, description="Unauthorized")
+   * )
    */
-  public function update(Request $request, $id): JsonResponse
+  public function update(TeamUpdateRequest $request, $id): JsonResponse
   {
-    if (Auth::guard('api')->check()) {
-      $team = Team::find($id);
-      $team->name = $request->input('name');
-      $team->team_match_id = $request->input('team_match_id');
-      $team->save();
+    $validated = $request->validated();
 
-      return response()->json(['status' => 200, 'team' => $team], 200);
+    $team = $this->teamService->update($id, $validated);
+    if (!$team) {
+      return response()->json(['status' => 404, 'message' => 'Not Found'], 404);
     }
 
-    return response()->json(['status' => 401, 'message' => 'Unauthorized'], 401);
+    return (new TeamResource($team))
+      ->additional(['status' => 200])
+      ->response()
+      ->setStatusCode(200);
 
+  }
+
+  /**
+   * Delete a team.
+   *
+   * @OA\Delete(
+   *   path="/api/team/{id}",
+   *   tags={"Teams"},
+   *   summary="Delete team",
+   *   security={{"bearerAuth":{}}},
+   *   @OA\Parameter(
+   *     name="id",
+   *     in="path",
+   *     required=true,
+   *     @OA\Schema(type="string")
+   *   ),
+   *   @OA\Response(response=200, description="OK"),
+   *   @OA\Response(response=404, description="Not Found"),
+   *   @OA\Response(response=401, description="Unauthorized")
+   * )
+   */
+  public function destroy(string $id): JsonResponse
+  {
+    $deleted = $this->teamService->delete($id);
+    if (!$deleted) {
+      return response()->json(['status' => 404, 'message' => 'Not Found'], 404);
+    }
+
+    return response()->json(['status' => 200, 'message' => 'Deleted'], 200);
   }
 }

@@ -1,189 +1,250 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Futsal API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A RESTful API for managing futsal teams, players, matches, and standings. The project uses Laravel 10 with PostgreSQL 17 and provides Swagger (OpenAPI) documentation.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Authentication with Laravel Passport (Bearer token)
+- CRUD for teams, players, matches, and team classification
+- Swagger UI for API documentation
+- Docker Compose setup with Postgres 17
+- Seeders with Faker for sample data
+- Health check endpoint
 
-## Get Started
+## Tech Stack
 
-1. Clone o repositório para sua máquina local:
+- PHP 8.3 / Laravel 10
+- PostgreSQL 17
+- Docker + Docker Compose
+- L5-Swagger (OpenAPI)
 
-```
-git clone https://github.com/Aureo-Bueno/futsal-api.git
-```
+## Quick Start (Docker Compose)
 
-2. Navigate to repositorie:
+1) Build and start containers:
 
-```
-cd futsal-api
-```
-
-3. Install dependencies:
-
-```
-composer install --ignore-platform-req=ext-fileinfo
+```bash
+docker compose up -d --build app
 ```
 
-4. Run docker command to up container MYSQL:
+2) The API will be available at:
+
+- Base URL: http://localhost:8000/api
+- Swagger UI: http://localhost:8000/api/documentation
+
+> The container entrypoint runs migrations and seeders automatically by default.
+
+### Optional entrypoint toggles
+
+If you want to disable automatic migrations or seeders, set environment variables in `docker-compose.yml`:
+
+- `RUN_MIGRATIONS=false`
+- `RUN_SEED=false`
+
+## Local Setup (without Docker)
+
+### Requirements
+
+- PHP 8.3
+- Composer
+- PostgreSQL 17
+
+### Steps
+
+1) Install dependencies:
+
+```bash
+composer install
+```
+
+2) Create your `.env` file:
+
+```bash
+cp .env.example .env
+```
+
+3) Configure database in `.env`:
 
 ```
-docker run -d --name futsal-mysql -e MYSQL_ROOT_PASSWORD=futsal2024 -e MYSQL_DATABASE=futsal_db -e MYSQL_USER=aureo_admin -e MYSQL_PASSWORD=aureo@2024 -p 3306:3306 mysql:latest
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=futsal_db
+DB_USERNAME=your_user
+DB_PASSWORD=your_password
 ```
 
-5. Generate keys:
+4) Generate app key:
 
+```bash
+php artisan key:generate
 ```
+
+5) Run migrations and seeders:
+
+```bash
+php artisan migrate --seed
+```
+
+6) Passport keys and personal client (for login tokens):
+
+```bash
 php artisan passport:keys
+php artisan passport:client --personal --name="Personal Access Client"
 ```
 
-6. Run migrate:
+7) Generate Swagger docs:
 
-```
-php artisan migrate
-```
-
-7. Run seed:
-
-```
-php artisan db:seed
+```bash
+php artisan l5-swagger:generate
 ```
 
-8. Run server:
+8) Run the API server:
 
-```
+```bash
 php artisan serve
 ```
 
-# API Endpoints and Requests
+- Base URL: http://127.0.0.1:8000/api
+- Swagger UI: http://127.0.0.1:8000/api/documentation
 
-A seguir estão os endpoints disponíveis e exemplos de requisições para a sua API.
+## Authentication
 
-## 1. Autenticação
+- Login endpoint returns a bearer token.
+- Most endpoints require `Authorization: Bearer <token>`.
 
-### 1.1 Login
+**Seeded admin user (dev only):**
 
-- **Método:** POST
-- **Endpoint:** http://127.0.0.1:8000/api/login
-- **Exemplo de Requisição:**
-  ```json
-  {
-    "email": "admin@admin.com",
-    "password": 123456
-  }
-  ```
+```
+email: admin@admin.com
+password: 123456
+```
 
-### 1.2 Get User
+## API Endpoints
 
-- **Método:** POST
-- **Endpoint:** http://127.0.0.1:8000/api/user
-- **Requisito:** Adicionar o token ao cabeçalho como Bearer.
+Base path: `/api`
 
-## 2. Player
+- `GET /health` - health check
+- `POST /login` - login and get token
+- `POST /user` - get current user (auth required)
+- `POST /logout` - logout (auth required)
 
-### 2.1 Get Players
+Players:
+- `GET /player`
+- `GET /player/{id}`
+- `POST /player`
+- `PUT /player/{id}`
+- `DELETE /player/{id}`
 
-- **Método:** GET
-- **Endpoint:** http://127.0.0.1:8000/api/player
-- **Requisito:** Adicionar o token ao cabeçalho como Bearer.
+Teams:
+- `GET /team`
+- `GET /team/{id}`
+- `POST /team`
+- `PUT /team/{id}`
+- `DELETE /team/{id}`
 
-### 2.2 Create Players
+Matches:
+- `GET /teamMatch`
+- `GET /teamMatch/{id}`
+- `POST /teamMatch`
+- `PUT /teamMatch/{id}`
+- `DELETE /teamMatch/{id}`
 
-- **Método:** POST
-- **Endpoint:** http://127.0.0.1:8000/api/player
-- **Requisito:** Adicionar o token ao cabeçalho como Bearer.
-  ```json
-  {
-    "name": "example",
-    "jersey_number": 01
-  }
-  ```
+Classification:
+- `GET /teamClassification`
+- `GET /teamClassification/{id}`
+- `POST /teamClassification`
+- `PUT /teamClassification/{id}`
+- `DELETE /teamClassification/{id}`
 
-### 2.3 Update Players
+Pagination:
+- List endpoints accept `?per_page=15` (min 1, max 100) and `?page=1`.
 
-- **Método:** PUT
-- **Endpoint:** http://127.0.0.1:8000/api/player/:id
-- **Requisito:** Adicionar o token ao cabeçalho como Bearer.
-  ```json
-  {
-    "name": "example",
-    "jersey_number": 01
-  }
-  ```
+## Example Requests
 
-## 3. Team
+### Login
 
-### 3.1 Get Team
+```bash
+curl -X POST http://localhost:8000/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@admin.com","password":"123456"}'
+```
 
-- **Método:** GET
-- **Endpoint:** http://127.0.0.1:8000/api/team
-- **Requisito:** Adicionar o token ao cabeçalho como Bearer.
+### Create Team
 
-### 3.2 Create Team
+```bash
+curl -X POST http://localhost:8000/api/team \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{"name":"Tigers FC"}'
+```
 
-- **Método:** POST
-- **Endpoint:** http://127.0.0.1:8000/api/team
-- **Requisito:** Adicionar o token ao cabeçalho como Bearer.
+### Create Match
 
-  ```json
-  {
-    "name": "example",
-    "team_match_id": "uuid"
-  }
-  ```
-
-### 3.3 Update Team
-
-- **Método:** PUT
-- **Endpoint:** http://127.0.0.1:8000/api/team/:id
-- **Requisito:** Adicionar o token ao cabeçalho como Bearer.
-  ```json
-  {
-    "name": "example",
-    "team_match_id": "uuid"
-  }
-  ```
-
-## 4. TeamMatch
-
-### 4.1 POST TeamMatch
-
-- **Método:** POST
-- **Endpoint:** http://127.0.0.1:8000/api/teamMatch
-- **Requisito:** Adicionar o token ao cabeçalho como Bearer.
-  ```json
-  {
-    "date_team_match": "2024/02/05",
-    "start_time": "19:00",
-    "end_time": "20:00",
+```bash
+curl -X POST http://localhost:8000/api/teamMatch \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
+    "date_team_match":"2026-02-10",
+    "start_time":"18:00",
+    "end_time":"19:00",
     "scoreboard": 0
-  }
-  ```
+  }'
+```
 
-### 4.2 Update TeamMatch
+### Update Team (requires match id)
 
-- **Método:** PUT
-- **Endpoint:** http://127.0.0.1:8000/api/teamMatch/:id
-- **Requisito:** Adicionar o token ao cabeçalho como Bearer.
-  ```json
-  {
-    "date_team_match": "2024/02/05",
-    "start_time": "19:00",
-    "end_time": "20:00",
-    "scoreboard": 0
-  }
-  ```
-  
-## 5. Team Classification
+```bash
+curl -X PUT http://localhost:8000/api/team/<TEAM_ID> \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
+    "name":"Tigers FC",
+    "team_match_id":"<MATCH_ID>"
+  }'
+```
 
-### 5.1 GET TeamClassification
+### Create Player
 
-- **Método:** GET
-- **Endpoint:** http://127.0.0.1:8000/api/teamClassification
-- **Requisito:** Adicionar o token ao cabeçalho como Bearer.
+```bash
+curl -X POST http://localhost:8000/api/player \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
+    "name":"John Doe",
+    "jersey_number": 10,
+    "team_id":"<TEAM_ID>"
+  }'
+```
+
+### Create Team Classification
+
+```bash
+curl -X POST http://localhost:8000/api/teamClassification \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
+    "team_id":"<TEAM_ID>",
+    "points": 20,
+    "number_of_goals": 45
+  }'
+```
+
+## Swagger
+
+- UI: http://localhost:8000/api/documentation
+- JSON: http://localhost:8000/docs?api-docs.json
+
+## Troubleshooting
+
+- If you change PHP code, rebuild the container:
+
+```bash
+docker compose up -d --build app
+```
+
+- View container logs:
+
+```bash
+docker compose logs -f app
+```
