@@ -1,31 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Swagger;
 
-use OpenApi\Annotations as OA;
+use OpenApi\Attributes as OA;
 
-/**
- * OpenAPI base specification.
- *
- * @OA\OpenApi(
- *   @OA\Info(
- *     title="Futsal API",
- *     version="1.0.0",
- *     description="API documentation"
- *   ),
- *   @OA\Server(
- *     url="http://localhost:8000",
- *     description="Local"
- *   )
- * )
- *
- * @OA\SecurityScheme(
- *   securityScheme="bearerAuth",
- *   type="http",
- *   scheme="bearer",
- *   bearerFormat="JWT"
- * )
- */
-final class OpenApi
-{
-}
+#[OA\Info(
+    version: '1.0.0',
+    title: 'Futsal API',
+    description: 'RESTful API for managing futsal teams, players, matches, and standings.'
+)]
+#[OA\Server(
+    url: 'http://localhost:8000',
+    description: 'Local API Server'
+)]
+#[OA\SecurityScheme(
+    securityScheme: 'bearerAuth',
+    type: 'http',
+    scheme: 'bearer',
+    bearerFormat: 'JWT'
+)]
+class OpenApi {}

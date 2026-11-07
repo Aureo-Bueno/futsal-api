@@ -9,17 +9,13 @@ use App\Models\User;
  */
 interface UserRepositoryInterface
 {
-  /**
-   * Find a user by id.
-   *
-   * @param int|string $id
-   */
-  public function findById(int|string $id): ?User;
+    /**
+     * Find a user by id.
+     */
+    public function findById(int|string $id): ?User;
 
-  /**
-   * Find a user by email.
-   *
-   * @param string $email
-   */
-  public function findByEmail(string $email): ?User;
+    /**
+     * Find a user by email.
+     */
+    public function findByEmail(string $email): ?User;
 }

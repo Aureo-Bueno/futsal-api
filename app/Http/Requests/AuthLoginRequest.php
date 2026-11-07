@@ -6,21 +6,21 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class AuthLoginRequest extends FormRequest
 {
-  public function authorize(): bool
-  {
-    return true;
-  }
+    public function authorize(): bool
+    {
+        return true;
+    }
 
-  /**
-   * Get the validation rules that apply to the request.
-   *
-   * @return array<string, mixed>
-   */
-  public function rules(): array
-  {
-    return [
-      'email' => 'required|email',
-      'password' => 'required|string',
-    ];
-  }
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, mixed>
+     */
+    public function rules(): array
+    {
+        return [
+            'email' => 'required|email|max:255',
+            'password' => 'required|string|max:255',
+        ];
+    }
 }

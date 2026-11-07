@@ -11,56 +11,62 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Team extends Model
 {
-  use HasFactory, HasUuids, SoftDeletes;
-  /**
-   * The table associated with the model.
-   *
-   * @var string
-   */
-  protected $table = 'teams';
+    use HasFactory, HasUuids, SoftDeletes;
 
-  /**
-   * The primary key associated with the table.
-   *
-   * @var string
-   */
-  protected $primaryKey = 'id';
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'teams';
 
-  /**
-   * The "type" of the primary key ID.
-   *
-   * @var string
-   */
-  protected $keyType = 'string';
+    /**
+     * The primary key associated with the table.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'id';
 
-  /**
-   * Indicates if the IDs are auto-incrementing.
-   *
-   * @var bool
-   */
-  public $incrementing = false;
+    /**
+     * The "type" of the primary key ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'string';
 
-  /**
-   * The attributes that are mass assignable.
-   *
-   * @var array
-   */
-  protected $fillable = [
-    'id',
-    'name',
-    'team_match_id',
-  ];
+    /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = false;
 
-  /**
-   * Get the players for the teams.
-   */
-  public function players(): HasMany
-  {
-    return $this->hasMany(Players::class, 'foreign_key');
-  }
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'id',
+        'name',
+        'team_match_id',
+    ];
 
-  public function team_match(): BelongsTo
-  {
-    return $this->belongsTo(TeamMatch::class);
-  }
+    /**
+     * Get the players for the teams.
+     */
+    public function players(): HasMany
+    {
+        return $this->hasMany(Players::class, 'team_id');
+    }
+
+    public function teamMatch(): BelongsTo
+    {
+        return $this->belongsTo(TeamMatch::class, 'team_match_id');
+    }
+
+    public function team_match(): BelongsTo
+    {
+        return $this->teamMatch();
+    }
 }

@@ -20,59 +20,59 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('health', function () {
-  $database = 'ok';
-  try {
-    DB::connection()->getPdo();
-  } catch (\Throwable $e) {
-    $database = 'down';
-  }
+    $database = 'ok';
+    try {
+        DB::connection()->getPdo();
+    } catch (Throwable $e) {
+        $database = 'down';
+    }
 
-  return response()->json([
-    'status' => 'ok',
-    'database' => $database,
-    'timestamp' => now()->toISOString(),
-  ], $database === 'ok' ? 200 : 503);
+    return response()->json([
+        'status' => 'ok',
+        'database' => $database,
+        'timestamp' => now()->toISOString(),
+    ], $database === 'ok' ? 200 : 503);
 });
 
 Route::controller(UserController::class)->group(function () {
-  Route::post('login', 'loginUser')->middleware('throttle:login');
+    Route::post('login', 'loginUser')->middleware('throttle:login');
 });
 
 Route::middleware('auth:api')->group(function () {
-  Route::controller(UserController::class)->group(function () {
-    Route::post('user', 'getUser');
-    Route::post('logout', 'userLogout');
-  });
+    Route::controller(UserController::class)->group(function () {
+        Route::post('user', 'getUser');
+        Route::post('logout', 'userLogout');
+    });
 
-  Route::controller(PlayersController::class)->group(function () {
-    Route::get('player', 'index');
-    Route::get('player/{id}', 'show');
-    Route::post('player', 'store');
-    Route::put('player/{id}', 'update');
-    Route::delete('player/{id}', 'destroy');
-  });
+    Route::controller(PlayersController::class)->group(function () {
+        Route::get('player', 'index');
+        Route::get('player/{id}', 'show');
+        Route::post('player', 'store');
+        Route::put('player/{id}', 'update');
+        Route::delete('player/{id}', 'destroy');
+    });
 
-  Route::controller(TeamController::class)->group(function () {
-    Route::get('team', 'index');
-    Route::get('team/{id}', 'show');
-    Route::post('team', 'store');
-    Route::put('team/{id}', 'update');
-    Route::delete('team/{id}', 'destroy');
-  });
+    Route::controller(TeamController::class)->group(function () {
+        Route::get('team', 'index');
+        Route::get('team/{id}', 'show');
+        Route::post('team', 'store');
+        Route::put('team/{id}', 'update');
+        Route::delete('team/{id}', 'destroy');
+    });
 
-  Route::controller(TeamClassificationController::class)->group(function () {
-    Route::get('teamClassification', 'index');
-    Route::get('teamClassification/{id}', 'show');
-    Route::post('teamClassification', 'store');
-    Route::put('teamClassification/{id}', 'update');
-    Route::delete('teamClassification/{id}', 'destroy');
-  });
+    Route::controller(TeamClassificationController::class)->group(function () {
+        Route::get('teamClassification', 'index');
+        Route::get('teamClassification/{id}', 'show');
+        Route::post('teamClassification', 'store');
+        Route::put('teamClassification/{id}', 'update');
+        Route::delete('teamClassification/{id}', 'destroy');
+    });
 
-  Route::controller(TeamMatchController::class)->group(function () {
-    Route::get('teamMatch', 'index');
-    Route::get('teamMatch/{id}', 'show');
-    Route::post('teamMatch', 'store');
-    Route::put('teamMatch/{id}', 'update');
-    Route::delete('teamMatch/{id}', 'destroy');
-  });
+    Route::controller(TeamMatchController::class)->group(function () {
+        Route::get('teamMatch', 'index');
+        Route::get('teamMatch/{id}', 'show');
+        Route::post('teamMatch', 'store');
+        Route::put('teamMatch/{id}', 'update');
+        Route::delete('teamMatch/{id}', 'destroy');
+    });
 });

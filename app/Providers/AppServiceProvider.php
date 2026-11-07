@@ -22,33 +22,35 @@ use App\Services\Implementations\TeamClassificationService;
 use App\Services\Implementations\TeamMatchService;
 use App\Services\Implementations\TeamService;
 use App\Services\Implementations\UserService;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-  /**
-   * Register any application services.
-   */
-  public function register(): void
-  {
-    $this->app->bind(PlayersRepositoryInterface::class, EloquentPlayersRepository::class);
-    $this->app->bind(TeamRepositoryInterface::class, EloquentTeamRepository::class);
-    $this->app->bind(TeamMatchRepositoryInterface::class, EloquentTeamMatchRepository::class);
-    $this->app->bind(TeamClassificationRepositoryInterface::class, EloquentTeamClassificationRepository::class);
-    $this->app->bind(UserRepositoryInterface::class, EloquentUserRepository::class);
+    /**
+     * Register any application services.
+     */
+    public function register(): void
+    {
+        $this->app->singleton(PlayersRepositoryInterface::class, EloquentPlayersRepository::class);
+        $this->app->singleton(TeamRepositoryInterface::class, EloquentTeamRepository::class);
+        $this->app->singleton(TeamMatchRepositoryInterface::class, EloquentTeamMatchRepository::class);
+        $this->app->singleton(TeamClassificationRepositoryInterface::class, EloquentTeamClassificationRepository::class);
+        $this->app->singleton(UserRepositoryInterface::class, EloquentUserRepository::class);
 
-    $this->app->bind(PlayersServiceInterface::class, PlayersService::class);
-    $this->app->bind(TeamServiceInterface::class, TeamService::class);
-    $this->app->bind(TeamMatchServiceInterface::class, TeamMatchService::class);
-    $this->app->bind(TeamClassificationServiceInterface::class, TeamClassificationService::class);
-    $this->app->bind(UserServiceInterface::class, UserService::class);
-  }
+        $this->app->singleton(PlayersServiceInterface::class, PlayersService::class);
+        $this->app->singleton(TeamServiceInterface::class, TeamService::class);
+        $this->app->singleton(TeamMatchServiceInterface::class, TeamMatchService::class);
+        $this->app->singleton(TeamClassificationServiceInterface::class, TeamClassificationService::class);
+        $this->app->singleton(UserServiceInterface::class, UserService::class);
+    }
 
-  /**
-   * Bootstrap any application services.
-   */
-  public function boot(): void
-  {
-    //
-  }
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+        Model::preventLazyLoading(! $this->app->isProduction());
+        $this->loadMigrationsFrom(base_path('vendor/laravel/passport/database/migrations'));
+    }
 }

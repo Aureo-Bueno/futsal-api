@@ -5,54 +5,55 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TeamClassification extends Model
 {
-  use HasFactory, HasUuids, SoftDeletes;
-  /**
-   * The table associated with the model.
-   *
-   * @var string
-   */
-  protected $table = 'team_classification';
+    use HasFactory, HasUuids, SoftDeletes;
 
-  /**
-   * The primary key associated with the table.
-   *
-   * @var string
-   */
-  protected $primaryKey = 'id';
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'team_classification';
 
-  /**
-   * The "type" of the primary key ID.
-   *
-   * @var string
-   */
-  protected $keyType = 'string';
+    /**
+     * The primary key associated with the table.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'id';
 
-  /**
-   * Indicates if the IDs are auto-incrementing.
-   *
-   * @var bool
-   */
-  public $incrementing = false;
+    /**
+     * The "type" of the primary key ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'string';
 
-  /**
-   * The attributes that are mass assignable.
-   *
-   * @var array
-   */
-  protected $fillable = [
-    'id',
-    'team_id',
-    'points',
-    'number_of_goals',
-  ];
+    /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = false;
 
-  public function team(): HasOne
-  {
-    return $this->hasOne(Team::class);
-  }
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'id',
+        'team_id',
+        'points',
+        'number_of_goals',
+    ];
+
+    public function team(): BelongsTo
+    {
+        return $this->belongsTo(Team::class, 'team_id');
+    }
 }

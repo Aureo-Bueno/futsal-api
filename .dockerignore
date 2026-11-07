@@ -1,0 +1,16 @@
+.git
+.github
+.gitignore
+.env
+.env.*
+!.env.example
+.phpunit.result.cache
+vendor/
+node_modules/
+storage/logs/*.log
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/testing/*
+storage/framework/views/*
+storage/oauth-private.key
+storage/oauth-public.key

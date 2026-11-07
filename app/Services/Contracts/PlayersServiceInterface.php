@@ -11,44 +11,39 @@ use Illuminate\Support\Collection;
  */
 interface PlayersServiceInterface
 {
-  /**
-   * List all players.
-   *
-   * @return Collection<int, Players>
-   */
-  public function list(): Collection;
+    /**
+     * List all players.
+     *
+     * @return Collection<int, Players>
+     */
+    public function list(): Collection;
 
-  /**
-   * Paginate players.
-   */
-  public function paginate(int $perPage = 15): LengthAwarePaginator;
+    /**
+     * Paginate players.
+     */
+    public function paginate(int $perPage = 15): LengthAwarePaginator;
 
-  /**
-   * Get a player by id.
-   *
-   * @param string $id
-   */
-  public function get(string $id): ?Players;
+    /**
+     * Get a player by id.
+     */
+    public function get(string $id): ?Players;
 
-  /**
-   * Create a player.
-   *
-   * @param array<string, mixed> $data
-   */
-  public function create(array $data): Players;
+    /**
+     * Create a player.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function create(array $data): Players;
 
-  /**
-   * Update a player.
-   *
-   * @param string $id
-   * @param array<string, mixed> $data
-   */
-  public function update(string $id, array $data): ?Players;
+    /**
+     * Update a player.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function update(string $id, array $data): ?Players;
 
-  /**
-   * Delete a player.
-   *
-   * @param string $id
-   */
-  public function delete(string $id): bool;
+    /**
+     * Delete a player.
+     */
+    public function delete(string $id): bool;
 }

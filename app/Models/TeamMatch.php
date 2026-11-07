@@ -10,53 +10,54 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TeamMatch extends Model
 {
-  use HasFactory, HasUuids, SoftDeletes;
-  /**
-   * The table associated with the model.
-   *
-   * @var string
-   */
-  protected $table = 'team_match';
+    use HasFactory, HasUuids, SoftDeletes;
 
-  /**
-   * The primary key associated with the table.
-   *
-   * @var string
-   */
-  protected $primaryKey = 'id';
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'team_match';
 
-  /**
-   * The "type" of the primary key ID.
-   *
-   * @var string
-   */
-  protected $keyType = 'string';
+    /**
+     * The primary key associated with the table.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'id';
 
-  /**
-   * Indicates if the IDs are auto-incrementing.
-   *
-   * @var bool
-   */
-  public $incrementing = false;
+    /**
+     * The "type" of the primary key ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'string';
 
-  /**
-   * The attributes that are mass assignable.
-   *
-   * @var array
-   */
-  protected $fillable = [
-    'id',
-    'date_team_match',
-    'start_time',
-    'end_time',
-    'scoreboard',
-  ];
+    /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = false;
 
-  /**
-   * Get the teams for the team match.
-   */
-  public function teams(): HasMany
-  {
-    return $this->hasMany(Team::class, 'foreign_key');
-  }
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'id',
+        'date_team_match',
+        'start_time',
+        'end_time',
+        'scoreboard',
+    ];
+
+    /**
+     * Get the teams for the team match.
+     */
+    public function teams(): HasMany
+    {
+        return $this->hasMany(Team::class, 'team_match_id');
+    }
 }

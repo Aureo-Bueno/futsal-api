@@ -8,20 +8,21 @@ use Illuminate\Database\Seeder;
 
 class PlayersSeeder extends Seeder
 {
-  /**
-   * Run the database seeds.
-   */
-  public function run(): void
-  {
-    $teams = Team::all();
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        $teams = Team::all();
 
-    if ($teams->isEmpty()) {
-      Players::factory()->count(10)->create();
-      return;
-    }
+        if ($teams->isEmpty()) {
+            Players::factory()->count(10)->create();
 
-    foreach ($teams as $team) {
-      Players::factory()->count(5)->create(['team_id' => $team->id]);
+            return;
+        }
+
+        foreach ($teams as $team) {
+            Players::factory()->count(5)->create(['team_id' => $team->id]);
+        }
     }
-  }
 }

@@ -1,6 +1,6 @@
 # Futsal API
 
-A RESTful API for managing futsal teams, players, matches, and standings. The project uses Laravel 10 with PostgreSQL 17 and provides Swagger (OpenAPI) documentation.
+A RESTful API for managing futsal teams, players, matches, and standings. The project uses Laravel 13 with PHP 8.5, PostgreSQL 17, and provides Swagger (OpenAPI) documentation.
 
 ## Features
 
@@ -13,7 +13,7 @@ A RESTful API for managing futsal teams, players, matches, and standings. The pr
 
 ## Tech Stack
 
-- PHP 8.3 / Laravel 10
+- PHP 8.5 / Laravel 13
 - PostgreSQL 17
 - Docker + Docker Compose
 - L5-Swagger (OpenAPI)
@@ -44,7 +44,7 @@ If you want to disable automatic migrations or seeders, set environment variable
 
 ### Requirements
 
-- PHP 8.3
+- PHP 8.5
 - Composer
 - PostgreSQL 17
 

@@ -6,20 +6,20 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class PlayersUpdateRequest extends FormRequest
 {
-  public function authorize(): bool
-  {
-    return true;
-  }
+    public function authorize(): bool
+    {
+        return true;
+    }
 
-  /**
-   * @return array<string, mixed>
-   */
-  public function rules(): array
-  {
-    return [
-      'name' => 'required|string',
-      'jersey_number' => 'required|numeric',
-      'team_id' => 'required|uuid|exists:teams,id',
-    ];
-  }
+    /**
+     * @return array<string, mixed>
+     */
+    public function rules(): array
+    {
+        return [
+            'name' => 'required|string|max:255',
+            'jersey_number' => 'required|integer|min:0|max:99',
+            'team_id' => 'required|uuid|exists:teams,id',
+        ];
+    }
 }

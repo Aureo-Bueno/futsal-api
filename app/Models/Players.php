@@ -10,49 +10,50 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Players extends Model
 {
-  use HasFactory, HasUuids, SoftDeletes;
-  /**
-   * The table associated with the model.
-   *
-   * @var string
-   */
-  protected $table = 'players';
+    use HasFactory, HasUuids, SoftDeletes;
 
-  /**
-   * The primary key associated with the table.
-   *
-   * @var string
-   */
-  protected $primaryKey = 'id';
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'players';
 
-  /**
-   * The "type" of the primary key ID.
-   *
-   * @var string
-   */
-  protected $keyType = 'string';
+    /**
+     * The primary key associated with the table.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'id';
 
-  /**
-   * Indicates if the IDs are auto-incrementing.
-   *
-   * @var bool
-   */
-  public $incrementing = false;
+    /**
+     * The "type" of the primary key ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'string';
 
-  /**
-   * The attributes that are mass assignable.
-   *
-   * @var array
-   */
-  protected $fillable = [
-    'id',
-    'name',
-    'jersey_number',
-    'team_id',
-  ];
+    /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = false;
 
-  public function team(): BelongsTo
-  {
-    return $this->belongsTo(Team::class);
-  }
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'id',
+        'name',
+        'jersey_number',
+        'team_id',
+    ];
+
+    public function team(): BelongsTo
+    {
+        return $this->belongsTo(Team::class);
+    }
 }
