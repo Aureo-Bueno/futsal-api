@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Futsal\EventSourcing;
 
+use Futsal\Contracts\EventEnvelope;
+
 abstract class AggregateRoot
 {
     protected int $version = 0;
@@ -32,6 +34,10 @@ abstract class AggregateRoot
     public function replay(array $events): void
     {
         foreach ($events as $event) {
+            if ($event instanceof EventEnvelope) {
+                $event = DomainEvent::fromEnvelope($event);
+            }
+
             $this->apply($event);
             $this->version++;
         }
