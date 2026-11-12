@@ -9,10 +9,16 @@ use Futsal\Contracts\EventEnvelope;
 
 final class SnsPublisher implements EventPublisher
 {
-    public function __construct(private readonly SnsClient $sns) {}
+    /** @param array<string, string> $topicArns */
+    public function __construct(
+        private readonly SnsClient $sns,
+        private readonly array $topicArns = [],
+    ) {}
 
     public function publish(string $topicArn, EventEnvelope $envelope): void
     {
+        $topicArn = $this->topicArns[$topicArn] ?? $topicArn;
+
         $arguments = [
             'TopicArn' => $topicArn,
             'Message' => json_encode($envelope->toArray(), JSON_THROW_ON_ERROR),
