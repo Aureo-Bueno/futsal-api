@@ -95,6 +95,37 @@ services:
       localstack:
         condition: service_healthy
 
+  match-service:
+    build:
+      context: .
+      dockerfile: match-service/Dockerfile
+    container_name: futsal-match-service
+    environment:
+      APP_ENV: local
+      APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: match_db
+      DB_USERNAME: futsal
+      DB_PASSWORD: futsal
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_ENDPOINT_URL: http://localstack:4566
+      MATCH_EVENTS_TOPIC_ARN: arn:aws:sns:us-east-1:000000000000:futsal-match-events.fifo
+      TEAM_EVENTS_QUEUE_URL: http://localstack:4566/000000000000/match-team-events
+      INTERNAL_HMAC_SECRET: local-secret
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./match-service:/var/www/html
+    depends_on:
+      postgres:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+
 volumes:
   postgres_data:
     name: futsal_event_sourcing_postgres_data
