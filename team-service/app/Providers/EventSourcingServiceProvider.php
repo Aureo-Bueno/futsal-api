@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use Aws\Sns\SnsClient;
 use Aws\Sqs\SqsClient;
+use Futsal\Contracts\Topics;
 use Futsal\EventSourcing\Outbox\OutboxRecorder;
 use Futsal\EventSourcing\Outbox\OutboxRelay;
 use Futsal\EventSourcing\Publisher\EventPublisher;
@@ -34,7 +35,13 @@ final class EventSourcingServiceProvider extends ServiceProvider
 
         $this->app->singleton(SnsClient::class, fn () => new SnsClient($aws));
         $this->app->singleton(SqsClient::class, fn () => new SqsClient($aws));
-        $this->app->singleton(EventPublisher::class, SnsPublisher::class);
+        $this->app->singleton(EventPublisher::class, fn ($app) => new SnsPublisher(
+            $app->make(SnsClient::class),
+            [
+                Topics::TEAM_EVENTS => (string) env('TEAM_EVENTS_TOPIC_ARN', Topics::TEAM_EVENTS),
+                Topics::MATCH_EVENTS => (string) env('MATCH_EVENTS_TOPIC_ARN', Topics::MATCH_EVENTS),
+            ],
+        ));
         $this->app->singleton(OutboxRelay::class);
 
         $this->app->singleton(AggregateRepository::class, fn ($app) => new AggregateRepository(

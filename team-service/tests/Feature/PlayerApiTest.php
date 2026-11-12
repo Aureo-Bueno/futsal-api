@@ -13,17 +13,20 @@ final class PlayerApiTest extends TestCase
 
     public function test_registers_player_and_rejects_duplicate_jersey(): void
     {
-        $teamId = $this->postJson('/teams', ['name' => 'Tigers'])->json('id');
+        $teamBody = json_encode(['name' => 'Tigers']);
+        $teamId = $this->postJson('/teams', ['name' => 'Tigers'], $this->internalHeaders('POST', '/teams', $teamBody))->json('id');
 
+        $body = json_encode(['name' => 'John', 'jersey_number' => 10]);
         $this->postJson("/teams/{$teamId}/players", [
             'name' => 'John',
             'jersey_number' => 10,
-        ])->assertCreated();
+        ], $this->internalHeaders('POST', "/teams/{$teamId}/players", $body))->assertCreated();
 
+        $duplicateBody = json_encode(['name' => 'Doe', 'jersey_number' => 10]);
         $this->postJson("/teams/{$teamId}/players", [
             'name' => 'Doe',
             'jersey_number' => 10,
-        ])->assertStatus(422);
+        ], $this->internalHeaders('POST', "/teams/{$teamId}/players", $duplicateBody))->assertStatus(422);
 
         $this->assertDatabaseHas('players', ['team_id' => $teamId, 'jersey_number' => 10]);
     }

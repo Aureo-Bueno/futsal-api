@@ -15,7 +15,8 @@ final class OutboxRelayCommandTest extends TestCase
 
     public function test_relays_pending_outbox_to_publisher(): void
     {
-        $this->postJson('/teams', ['name' => 'Tigers'])->assertCreated();
+        $body = json_encode(['name' => 'Tigers']);
+        $this->postJson('/teams', ['name' => 'Tigers'], $this->internalHeaders('POST', '/teams', $body))->assertCreated();
 
         $publisher = new class implements EventPublisher
         {

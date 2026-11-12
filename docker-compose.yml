@@ -36,6 +36,65 @@ services:
       timeout: 5s
       retries: 10
 
+  team-service:
+    build:
+      context: .
+      dockerfile: team-service/Dockerfile
+    container_name: futsal-team-service
+    environment:
+      APP_ENV: local
+      APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: team_db
+      DB_USERNAME: futsal
+      DB_PASSWORD: futsal
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_ENDPOINT_URL: http://localstack:4566
+      TEAM_EVENTS_TOPIC_ARN: arn:aws:sns:us-east-1:000000000000:futsal-team-events
+      INTERNAL_HMAC_SECRET: local-secret
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./team-service:/var/www/html
+    depends_on:
+      postgres:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+
+  team-worker:
+    build:
+      context: .
+      dockerfile: team-service/Dockerfile
+    container_name: futsal-team-worker
+    entrypoint: ["/usr/local/bin/worker.sh"]
+    environment:
+      APP_ENV: local
+      APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: team_db
+      DB_USERNAME: futsal
+      DB_PASSWORD: futsal
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_ENDPOINT_URL: http://localstack:4566
+      TEAM_EVENTS_TOPIC_ARN: arn:aws:sns:us-east-1:000000000000:futsal-team-events
+      INTERNAL_HMAC_SECRET: local-secret
+    volumes:
+      - ./team-service:/var/www/html
+    depends_on:
+      postgres:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+
 volumes:
   postgres_data:
     name: futsal_event_sourcing_postgres_data
