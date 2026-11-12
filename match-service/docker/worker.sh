@@ -6,4 +6,15 @@ until php -r "new PDO('pgsql:host='.getenv('DB_HOST').';dbname='.getenv('DB_DATA
   sleep 2
 done
 
-exec php artisan outbox:relay --daemon
+php artisan outbox:relay --daemon &
+RELAY_PID=$!
+
+php artisan events:consume-team &
+CONSUMER_PID=$!
+
+trap 'kill "$RELAY_PID" "$CONSUMER_PID" 2>/dev/null || true' TERM INT
+
+wait -n
+
+kill "$RELAY_PID" "$CONSUMER_PID" 2>/dev/null || true
+exit 1
