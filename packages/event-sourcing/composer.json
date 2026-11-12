@@ -1,0 +1,22 @@
+{
+    "name": "futsal/event-sourcing",
+    "description": "Event store, outbox e mensageria para os serviços da Futsal API",
+    "type": "library",
+    "require": {
+        "php": "^8.5",
+        "futsal/contracts": "@dev",
+        "illuminate/database": "^13.0",
+        "illuminate/support": "^13.0",
+        "aws/aws-sdk-php": "^3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^13.4"
+    },
+    "repositories": [
+        { "type": "path", "url": "../contracts", "options": { "symlink": true } }
+    ],
+    "autoload": { "psr-4": { "Futsal\\EventSourcing\\": "src/" } },
+    "autoload-dev": { "psr-4": { "Futsal\\EventSourcing\\Tests\\": "tests/" } },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
