@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\InternalEventExportController;
 use App\Http\Controllers\MatchController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,4 +14,5 @@ Route::middleware('internal')->group(function (): void {
     Route::post('/matches/{id}/goals', [MatchController::class, 'goal']);
     Route::post('/matches/{id}/finish', [MatchController::class, 'finish']);
     Route::post('/matches/{id}/cancel', [MatchController::class, 'cancel']);
+    Route::get('/internal/events', [InternalEventExportController::class, 'index']);
 });
