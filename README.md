@@ -44,7 +44,7 @@ flowchart LR
         S[standings-service\nAPI :8003]
     end
 
-    subgraph Dados[(Bancos)]
+    subgraph Dados[Bancos]
         BDB[(bff_db)]
         TDB[(team_db)]
         MDB[(match_db)]
