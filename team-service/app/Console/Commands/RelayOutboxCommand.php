@@ -6,6 +6,7 @@ namespace App\Console\Commands;
 
 use Futsal\EventSourcing\Outbox\OutboxRelay;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 final class RelayOutboxCommand extends Command
 {
@@ -18,6 +19,10 @@ final class RelayOutboxCommand extends Command
         do {
             $count = $relay->relay((int) $this->option('limit'));
             $this->info("Published {$count} events");
+
+            if ($count > 0) {
+                Log::info('Outbox events relayed', ['count' => $count]);
+            }
 
             if (! $this->option('daemon')) {
                 break;

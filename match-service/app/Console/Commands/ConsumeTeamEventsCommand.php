@@ -7,6 +7,7 @@ namespace App\Console\Commands;
 use App\Application\Team\Handlers\SyncKnownTeamsHandler;
 use Futsal\EventSourcing\Consumer\SqsEventConsumer;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 final class ConsumeTeamEventsCommand extends Command
 {
@@ -21,6 +22,10 @@ final class ConsumeTeamEventsCommand extends Command
         do {
             $count = $consumer->consume($queueUrl, $handler);
             $this->info("Processed {$count} events");
+
+            if ($count > 0) {
+                Log::info('Team events consumed', ['count' => $count]);
+            }
         } while (! $this->option('once'));
 
         return self::SUCCESS;

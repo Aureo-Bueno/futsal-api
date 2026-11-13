@@ -128,6 +128,7 @@
       }
     ]
   },
+  "refresh": "10s",
   "time": {
     "from": "now-1h",
     "to": "now"
