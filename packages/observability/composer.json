@@ -1,0 +1,19 @@
+{
+    "name": "futsal/observability",
+    "description": "Canal de logs OTLP para os serviços da Futsal API",
+    "type": "library",
+    "require": {
+        "php": "^8.5",
+        "monolog/monolog": "^3.0",
+        "open-telemetry/exporter-otlp": "^1.5",
+        "open-telemetry/opentelemetry-logger-monolog": "^1.3",
+        "open-telemetry/sdk": "^1.16"
+    },
+    "autoload": {
+        "psr-4": {
+            "Futsal\\Observability\\": "src/"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

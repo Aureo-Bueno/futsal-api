@@ -50,6 +50,7 @@ WORKDIR /var/www/html
 
 # Install PHP dependencies first (better layer caching)
 COPY packages/contracts /var/www/packages/contracts
+COPY packages/observability /var/www/packages/observability
 COPY bff/composer.json bff/composer.lock ./
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-scripts \
     && composer clear-cache

@@ -11,6 +11,7 @@ WORKDIR /var/www/html
 
 COPY packages/contracts /var/www/packages/contracts
 COPY packages/event-sourcing /var/www/packages/event-sourcing
+COPY packages/observability /var/www/packages/observability
 
 COPY standings-service/composer.json standings-service/composer.lock ./
 RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist

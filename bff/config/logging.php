@@ -1,5 +1,6 @@
 <?php
 
+use Futsal\Observability\Logging\OtlpLoggerFactory;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -54,7 +55,7 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['single'],
+            'channels' => explode(',', (string) env('LOG_STACK', 'single')),
             'ignore_exceptions' => false,
         ],
 
@@ -103,6 +104,15 @@ return [
                 'stream' => 'php://stderr',
             ],
             'processors' => [PsrLogMessageProcessor::class],
+        ],
+
+        'otlp' => [
+            'driver' => 'custom',
+            'via' => OtlpLoggerFactory::class,
+            'level' => env('LOG_LEVEL', 'debug'),
+            'service_name' => env('OTEL_SERVICE_NAME', env('APP_NAME', 'laravel')),
+            'service_namespace' => env('OTEL_SERVICE_NAMESPACE', 'futsal'),
+            'environment' => env('APP_ENV', 'local'),
         ],
 
         'syslog' => [

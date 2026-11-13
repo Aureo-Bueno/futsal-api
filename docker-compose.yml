@@ -1,3 +1,11 @@
+x-otel-env: &otel-env
+  LOG_CHANNEL: stack
+  LOG_STACK: "single,otlp"
+  LOG_LEVEL: debug
+  OTEL_SERVICE_NAMESPACE: futsal
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+  OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+
 services:
   postgres:
     image: postgres:17
@@ -42,6 +50,8 @@ services:
       dockerfile: team-service/Dockerfile
     container_name: futsal-team-service
     environment:
+      <<: *otel-env
+      OTEL_SERVICE_NAME: team-service
       APP_ENV: local
       APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
       DB_CONNECTION: pgsql
@@ -61,6 +71,8 @@ services:
     volumes:
       - ./team-service:/var/www/html
     depends_on:
+      otel-collector:
+        condition: service_started
       postgres:
         condition: service_healthy
       localstack:
@@ -73,6 +85,8 @@ services:
     container_name: futsal-team-worker
     entrypoint: ["/usr/local/bin/worker.sh"]
     environment:
+      <<: *otel-env
+      OTEL_SERVICE_NAME: team-worker
       APP_ENV: local
       APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
       DB_CONNECTION: pgsql
@@ -90,6 +104,8 @@ services:
     volumes:
       - ./team-service:/var/www/html
     depends_on:
+      otel-collector:
+        condition: service_started
       postgres:
         condition: service_healthy
       localstack:
@@ -101,6 +117,8 @@ services:
       dockerfile: match-service/Dockerfile
     container_name: futsal-match-service
     environment:
+      <<: *otel-env
+      OTEL_SERVICE_NAME: match-service
       APP_ENV: local
       APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
       DB_CONNECTION: pgsql
@@ -121,6 +139,8 @@ services:
     volumes:
       - ./match-service:/var/www/html
     depends_on:
+      otel-collector:
+        condition: service_started
       postgres:
         condition: service_healthy
       localstack:
@@ -133,6 +153,8 @@ services:
     container_name: futsal-match-worker
     entrypoint: ["/usr/local/bin/worker.sh"]
     environment:
+      <<: *otel-env
+      OTEL_SERVICE_NAME: match-worker
       APP_ENV: local
       APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
       DB_CONNECTION: pgsql
@@ -151,6 +173,8 @@ services:
     volumes:
       - ./match-service:/var/www/html
     depends_on:
+      otel-collector:
+        condition: service_started
       postgres:
         condition: service_healthy
       localstack:
@@ -162,6 +186,8 @@ services:
       dockerfile: standings-service/Dockerfile
     container_name: futsal-standings-service
     environment:
+      <<: *otel-env
+      OTEL_SERVICE_NAME: standings-service
       APP_ENV: local
       APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
       DB_CONNECTION: pgsql
@@ -181,6 +207,8 @@ services:
     volumes:
       - ./standings-service:/var/www/html
     depends_on:
+      otel-collector:
+        condition: service_started
       postgres:
         condition: service_healthy
       localstack:
@@ -193,6 +221,8 @@ services:
     container_name: futsal-standings-worker
     entrypoint: ["/usr/local/bin/worker.sh"]
     environment:
+      <<: *otel-env
+      OTEL_SERVICE_NAME: standings-worker
       APP_ENV: local
       APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
       DB_CONNECTION: pgsql
@@ -210,6 +240,8 @@ services:
     volumes:
       - ./standings-service:/var/www/html
     depends_on:
+      otel-collector:
+        condition: service_started
       postgres:
         condition: service_healthy
       localstack:
@@ -221,6 +253,8 @@ services:
       dockerfile: bff/Dockerfile
     container_name: futsal-bff
     environment:
+      <<: *otel-env
+      OTEL_SERVICE_NAME: bff
       APP_ENV: local
       APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
       DB_CONNECTION: pgsql
@@ -239,6 +273,8 @@ services:
     volumes:
       - ./bff:/var/www/html
     depends_on:
+      otel-collector:
+        condition: service_started
       postgres:
         condition: service_healthy
       team-service:
@@ -248,8 +284,54 @@ services:
       standings-service:
         condition: service_started
 
+  loki:
+    image: grafana/loki:3.7.9
+    container_name: futsal-loki
+    command: ["-config.file=/etc/loki/config.yml"]
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./infra/observability/loki/config.yml:/etc/loki/config.yml:ro
+      - loki_data:/loki
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.149.0
+    container_name: futsal-otel-collector
+    command: ["--config=/etc/otelcol/config.yml"]
+    volumes:
+      - ./infra/observability/otel/config.yml:/etc/otelcol/config.yml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    depends_on:
+      loki:
+        condition: service_started
+
+  grafana:
+    image: grafana/grafana:13.2.6
+    container_name: futsal-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./infra/observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./infra/observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      loki:
+        condition: service_started
+
 volumes:
   postgres_data:
     name: futsal_event_sourcing_postgres_data
   localstack_data:
     name: futsal_event_sourcing_localstack_data
+  loki_data:
+    name: futsal_event_sourcing_loki_data
+  grafana_data:
+    name: futsal_event_sourcing_grafana_data

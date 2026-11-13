@@ -151,6 +151,9 @@ Serviços:
 - match-service: `http://localhost:8002`
 - standings-service: `http://localhost:8003`
 - LocalStack: `http://localhost:4566`
+- OTel Collector: `http://localhost:4318` (OTLP HTTP) e `localhost:4317` (gRPC)
+- Loki: `http://localhost:3100`
+- Grafana: `http://localhost:3000` (`admin`/`admin`)
 
 Workers `team-worker`, `match-worker` e `standings-worker` não expõem portas.
 
@@ -190,3 +193,29 @@ E2E:
   - `match-worker`: `outbox:relay --daemon` + `events:consume-team`.
   - `standings-worker`: `events:consume-match`.
 - Reprojeção: `php artisan standings:rebuild`.
+
+## Observabilidade
+
+Os serviços enviam logs via OTLP para o `otel-collector`, que exporta para o Loki usando o endpoint OTLP nativo. O Grafana é provisionado com o datasource Loki e o dashboard `Futsal - Logs`.
+
+- Canal de log: `otlp` em `config/logging.php` (pacote `futsal/observability`).
+- `LOG_STACK=single,otlp`: mantém o arquivo local e envia a cópia via OTLP.
+- Endpoint: `OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318`.
+- Labels no Loki: `service_name`, `service_namespace`, `deployment_environment`.
+- Retenção: 7 dias.
+
+Abrir: `http://localhost:3000` e selecionar o dashboard `Futsal - Logs`.
+
+Smoke test:
+
+```bash
+docker compose exec -T team-service php artisan tinker \
+  --execute="Illuminate\Support\Facades\Log::info('otel smoke test');"
+```
+
+Consulta direta no Loki:
+
+```bash
+curl -s -G http://localhost:3100/loki/api/v1/query_range \
+  --data-urlencode 'query={service_name="team-service"}'
+```
