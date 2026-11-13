@@ -39,10 +39,10 @@ services:
       - ./infra/localstack/init.sh:/etc/localstack/init/ready.d/init.sh:ro
       - localstack_data:/var/lib/localstack
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      test: ["CMD-SHELL", "test -f /tmp/futsal-init-ready && awslocal sqs get-queue-url --queue-name standings-match-events.fifo >/dev/null && awslocal sqs get-queue-url --queue-name match-team-events >/dev/null"]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 20
 
   team-service:
     build:
@@ -67,6 +67,11 @@ services:
       AWS_ENDPOINT_URL: http://localstack:4566
       TEAM_EVENTS_TOPIC_ARN: arn:aws:sns:us-east-1:000000000000:futsal-team-events
       INTERNAL_HMAC_SECRET: local-secret
+    healthcheck:
+      test: ["CMD-SHELL", "php -r '$$s=@fsockopen(\"127.0.0.1\",8001); exit($$s?0:1);'"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
     ports:
       - "8001:8001"
     volumes:
@@ -85,6 +90,7 @@ services:
       dockerfile: team-service/Dockerfile
     container_name: futsal-team-worker
     entrypoint: ["/usr/local/bin/worker.sh"]
+    restart: unless-stopped
     environment:
       <<: *otel-env
       OTEL_SERVICE_NAME: team-worker
@@ -111,6 +117,8 @@ services:
         condition: service_healthy
       localstack:
         condition: service_healthy
+      team-service:
+        condition: service_healthy
 
   match-service:
     build:
@@ -136,6 +144,11 @@ services:
       MATCH_EVENTS_TOPIC_ARN: arn:aws:sns:us-east-1:000000000000:futsal-match-events.fifo
       TEAM_EVENTS_QUEUE_URL: http://localstack:4566/000000000000/match-team-events
       INTERNAL_HMAC_SECRET: local-secret
+    healthcheck:
+      test: ["CMD-SHELL", "php -r '$$s=@fsockopen(\"127.0.0.1\",8002); exit($$s?0:1);'"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
     ports:
       - "8002:8002"
     volumes:
@@ -154,6 +167,7 @@ services:
       dockerfile: match-service/Dockerfile
     container_name: futsal-match-worker
     entrypoint: ["/usr/local/bin/worker.sh"]
+    restart: unless-stopped
     environment:
       <<: *otel-env
       OTEL_SERVICE_NAME: match-worker
@@ -181,6 +195,8 @@ services:
         condition: service_healthy
       localstack:
         condition: service_healthy
+      match-service:
+        condition: service_healthy
 
   standings-service:
     build:
@@ -205,6 +221,11 @@ services:
       AWS_ENDPOINT_URL: http://localstack:4566
       STANDINGS_QUEUE_URL: http://localstack:4566/000000000000/standings-match-events.fifo
       INTERNAL_HMAC_SECRET: local-secret
+    healthcheck:
+      test: ["CMD-SHELL", "php -r '$$s=@fsockopen(\"127.0.0.1\",8003); exit($$s?0:1);'"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
     ports:
       - "8003:8003"
     volumes:
@@ -223,6 +244,7 @@ services:
       dockerfile: standings-service/Dockerfile
     container_name: futsal-standings-worker
     entrypoint: ["/usr/local/bin/worker.sh"]
+    restart: unless-stopped
     environment:
       <<: *otel-env
       OTEL_SERVICE_NAME: standings-worker
@@ -248,6 +270,8 @@ services:
       postgres:
         condition: service_healthy
       localstack:
+        condition: service_healthy
+      standings-service:
         condition: service_healthy
 
   bff:
@@ -281,11 +305,11 @@ services:
       postgres:
         condition: service_healthy
       team-service:
-        condition: service_started
+        condition: service_healthy
       match-service:
-        condition: service_started
+        condition: service_healthy
       standings-service:
-        condition: service_started
+        condition: service_healthy
 
   loki:
     image: grafana/loki:3.7.9

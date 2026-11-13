@@ -50,3 +50,5 @@ awslocal sns subscribe \
   --protocol sqs \
   --notification-endpoint "$MATCH_ARN" \
   --attributes '{"RawMessageDelivery":"true","FilterPolicy":"{\"eventType\":[\"team.created\",\"team.updated\",\"team.deactivated\",\"player.registered\",\"player.transferred\",\"player.removed\"]}"}'
+
+touch /tmp/futsal-init-ready
