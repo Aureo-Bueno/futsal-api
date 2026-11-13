@@ -215,6 +215,39 @@ services:
       localstack:
         condition: service_healthy
 
+  bff:
+    build:
+      context: .
+      dockerfile: bff/Dockerfile
+    container_name: futsal-bff
+    environment:
+      APP_ENV: local
+      APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: bff_db
+      DB_USERNAME: futsal
+      DB_PASSWORD: futsal
+      TEAM_SERVICE_URL: http://team-service:8001
+      MATCH_SERVICE_URL: http://match-service:8002
+      STANDINGS_SERVICE_URL: http://standings-service:8003
+      INTERNAL_HMAC_SECRET: local-secret
+      RUN_SEED: "true"
+    ports:
+      - "8000:80"
+    volumes:
+      - ./bff:/var/www/html
+    depends_on:
+      postgres:
+        condition: service_healthy
+      team-service:
+        condition: service_started
+      match-service:
+        condition: service_started
+      standings-service:
+        condition: service_started
+
 volumes:
   postgres_data:
     name: futsal_event_sourcing_postgres_data

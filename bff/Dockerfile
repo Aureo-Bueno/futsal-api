@@ -49,12 +49,13 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 WORKDIR /var/www/html
 
 # Install PHP dependencies first (better layer caching)
-COPY composer.json composer.lock ./
+COPY packages/contracts /var/www/packages/contracts
+COPY bff/composer.json bff/composer.lock ./
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-scripts \
     && composer clear-cache
 
 # Copy application code
-COPY . .
+COPY bff/ .
 
 # Apache document root -> /public and allow .htaccess overrides
 RUN sed -ri 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf \
