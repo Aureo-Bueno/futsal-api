@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 
 abstract class TestCase extends BaseTestCase
 {
-    protected function internalHeaders(string $method, string $path, string $body = ''): array
+    protected function internalHeaders(string $method, string $path, string $body = '[]'): array
     {
         $timestamp = (string) time();
         $signer = $this->app->make(RequestSigner::class);
