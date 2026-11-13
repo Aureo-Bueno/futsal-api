@@ -9,6 +9,7 @@
   "license": "MIT",
   "require": {
     "php": "^8.5",
+    "futsal/contracts": "@dev",
     "guzzlehttp/guzzle": "^8.3.1",
     "laravel/framework": "^13.40.0",
     "laravel/passport": "^13.10.0",
@@ -66,5 +67,13 @@
     }
   },
   "minimum-stability": "stable",
-  "prefer-stable": true
+  "prefer-stable": true,
+  "repositories": [{
+    "name": "contracts",
+    "type": "path",
+    "url": "../packages/contracts",
+    "options": {
+      "symlink": true
+    }
+  }]
 }

@@ -22,6 +22,7 @@ use App\Services\Implementations\TeamClassificationService;
 use App\Services\Implementations\TeamMatchService;
 use App\Services\Implementations\TeamService;
 use App\Services\Implementations\UserService;
+use Futsal\Contracts\Internal\RequestSigner;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 
@@ -43,6 +44,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(TeamMatchServiceInterface::class, TeamMatchService::class);
         $this->app->singleton(TeamClassificationServiceInterface::class, TeamClassificationService::class);
         $this->app->singleton(UserServiceInterface::class, UserService::class);
+
+        $this->app->singleton(RequestSigner::class, fn () => new RequestSigner(
+            (string) config('services.internal.secret'),
+        ));
     }
 
     /**

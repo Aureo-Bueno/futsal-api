@@ -25,6 +25,13 @@ return [
         'token' => env('POSTMARK_TOKEN'),
     ],
 
+    'internal' => [
+        'secret' => env('INTERNAL_HMAC_SECRET', 'local-secret'),
+        'team_url' => env('TEAM_SERVICE_URL', 'http://team-service:8001'),
+        'match_url' => env('MATCH_SERVICE_URL', 'http://match-service:8002'),
+        'standings_url' => env('STANDINGS_SERVICE_URL', 'http://standings-service:8003'),
+    ],
+
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),

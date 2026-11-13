@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dd4e091713376ea8a4c85eed25eb6cd7",
+    "content-hash": "7423a28269cb5544d7e7e88846af5a87",
     "packages": [
         {
             "name": "brick/math",
@@ -722,6 +722,37 @@
                 }
             ],
             "time": "2025-12-03T09:33:47+00:00"
+        },
+        {
+            "name": "futsal/contracts",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "../packages/contracts",
+                "reference": "fcc20e787122e6684f72c454433567c4c0b9bd89"
+            },
+            "require": {
+                "php": "^8.5"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^13.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Futsal\\Contracts\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Futsal\\Contracts\\Tests\\": "tests/"
+                }
+            },
+            "description": "Contratos de eventos e protocolo interno da Futsal API",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
         },
         {
             "name": "graham-campbell/result-type",
@@ -10287,7 +10318,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "futsal/contracts": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
