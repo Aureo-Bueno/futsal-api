@@ -35,7 +35,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{service_name=~\"$service\"}",
+          "expr": "{service_name=~\"$service\"} | json",
           "queryType": "range",
           "refId": "A"
         }

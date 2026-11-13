@@ -35,8 +35,13 @@ final class OtlpLoggerFactory
         $handler = new Handler(
             $loggerProvider,
             $config['level'] ?? 'debug',
+            true,
+            new JsonLogFormatter,
         );
 
-        return new Logger('otlp', [$handler]);
+        $logger = new Logger('otlp', [$handler]);
+        $logger->pushProcessor(new OtelContextProcessor);
+
+        return $logger;
     }
 }

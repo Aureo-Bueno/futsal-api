@@ -8,6 +8,7 @@ use Futsal\Contracts\Internal\RequestSigner;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use OpenTelemetry\API\Globals;
 
 final class InternalClient
 {
@@ -40,14 +41,20 @@ final class InternalClient
         $body = $method === 'GET' || $method === 'DELETE' ? '' : json_encode($data, JSON_THROW_ON_ERROR);
         $signature = $this->signer->sign($method, $path, $body, $timestamp);
 
-        $request = Http::withHeaders([
+        $requestId = $this->currentHeader('X-Request-Id') ?? (string) Str::uuid();
+        $correlationId = $this->currentHeader('X-Correlation-Id') ?? $requestId;
+
+        $traceHeaders = [];
+        Globals::propagator()->inject($traceHeaders);
+
+        $request = Http::withHeaders(array_merge($traceHeaders, [
             'X-User-Id' => $user?->id ?? '00000000-0000-0000-0000-000000000000',
-            'X-Request-Id' => (string) Str::uuid(),
-            'X-Correlation-Id' => (string) Str::uuid(),
+            'X-Request-Id' => $requestId,
+            'X-Correlation-Id' => $correlationId,
             'X-Internal-Timestamp' => $timestamp,
             'X-Signature' => $signature,
             'Accept' => 'application/json',
-        ]);
+        ]));
 
         if ($asQuery) {
             return $request->get($base.$path, $data);
@@ -56,5 +63,16 @@ final class InternalClient
         return $request
             ->withHeaders(['Content-Type' => 'application/json'])
             ->send($method, $base.$path, $body === '' ? [] : ['body' => $body]);
+    }
+
+    private function currentHeader(string $name): ?string
+    {
+        if (! app()->bound('request')) {
+            return null;
+        }
+
+        $value = request()->headers->get($name);
+
+        return is_string($value) && $value !== '' ? $value : null;
     }
 }

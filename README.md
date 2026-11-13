@@ -201,6 +201,9 @@ Os serviços enviam logs via OTLP para o `otel-collector`, que exporta para o Lo
 - Canal de log: `otlp` em `config/logging.php` (pacote `futsal/observability`).
 - `LOG_STACK=single,otlp`: mantém o arquivo local e envia a cópia via OTLP.
 - Endpoint: `OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318`.
+- Corpo em JSON com `message`, `level`, `channel`, `timestamp`, `request_id`, `correlation_id`, `trace_id`, `span_id`, `method`, `path`, `context` e `extra`.
+- `request_id` e `correlation_id` são gerados no BFF (ou herdados de `X-Request-Id`/`X-Correlation-Id`) e propagados nas chamadas internas. Os serviços de domínio reutilizam esses headers.
+- O middleware de observabilidade inicia um span por requisição, propaga `traceparent` para os serviços internos e registra `trace_id`/`span_id` em cada log.
 - Labels no Loki: `service_name`, `service_namespace`, `deployment_environment`.
 - Retenção: 7 dias.
 
@@ -217,5 +220,5 @@ Consulta direta no Loki:
 
 ```bash
 curl -s -G http://localhost:3100/loki/api/v1/query_range \
-  --data-urlencode 'query={service_name="team-service"}'
+  --data-urlencode 'query={service_name="team-service"} | json'
 ```
