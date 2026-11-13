@@ -8,17 +8,6 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
-
 Route::get('health', function () {
     $database = 'ok';
     try {
@@ -44,35 +33,30 @@ Route::middleware('auth:api')->group(function () {
         Route::post('logout', 'userLogout');
     });
 
-    Route::controller(PlayersController::class)->group(function () {
-        Route::get('player', 'index');
-        Route::get('player/{id}', 'show');
-        Route::post('player', 'store');
-        Route::put('player/{id}', 'update');
-        Route::delete('player/{id}', 'destroy');
-    });
+    Route::get('teams', [TeamController::class, 'index']);
+    Route::get('teams/{id}', [TeamController::class, 'show']);
+    Route::post('teams', [TeamController::class, 'store']);
+    Route::put('teams/{id}', [TeamController::class, 'update']);
+    Route::delete('teams/{id}', [TeamController::class, 'destroy']);
+    Route::get('team', [TeamController::class, 'index']);
 
-    Route::controller(TeamController::class)->group(function () {
-        Route::get('team', 'index');
-        Route::get('team/{id}', 'show');
-        Route::post('team', 'store');
-        Route::put('team/{id}', 'update');
-        Route::delete('team/{id}', 'destroy');
-    });
+    Route::get('players', [PlayersController::class, 'index']);
+    Route::get('players/{id}', [PlayersController::class, 'show']);
+    Route::post('teams/{teamId}/players', [PlayersController::class, 'store']);
+    Route::put('players/{id}/transfer', [PlayersController::class, 'transfer']);
+    Route::delete('players/{id}', [PlayersController::class, 'destroy']);
+    Route::get('player', [PlayersController::class, 'index']);
 
-    Route::controller(TeamClassificationController::class)->group(function () {
-        Route::get('teamClassification', 'index');
-        Route::get('teamClassification/{id}', 'show');
-        Route::post('teamClassification', 'store');
-        Route::put('teamClassification/{id}', 'update');
-        Route::delete('teamClassification/{id}', 'destroy');
-    });
+    Route::get('matches', [TeamMatchController::class, 'index']);
+    Route::get('matches/{id}', [TeamMatchController::class, 'show']);
+    Route::post('matches', [TeamMatchController::class, 'store']);
+    Route::post('matches/{id}/start', [TeamMatchController::class, 'start']);
+    Route::post('matches/{id}/goals', [TeamMatchController::class, 'goal']);
+    Route::post('matches/{id}/finish', [TeamMatchController::class, 'finish']);
+    Route::post('matches/{id}/cancel', [TeamMatchController::class, 'cancel']);
+    Route::get('teamMatch', [TeamMatchController::class, 'index']);
 
-    Route::controller(TeamMatchController::class)->group(function () {
-        Route::get('teamMatch', 'index');
-        Route::get('teamMatch/{id}', 'show');
-        Route::post('teamMatch', 'store');
-        Route::put('teamMatch/{id}', 'update');
-        Route::delete('teamMatch/{id}', 'destroy');
-    });
+    Route::get('standings', [TeamClassificationController::class, 'index']);
+    Route::get('teamClassification', [TeamClassificationController::class, 'index']);
+    Route::any('teamClassification/{any?}', fn () => response()->json(['message' => 'Method Not Allowed'], 405))->where('any', '.*');
 });
