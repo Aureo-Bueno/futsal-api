@@ -204,7 +204,9 @@ Os serviços enviam logs via OTLP para o `otel-collector`, que exporta para o Lo
 - Corpo em JSON com `message`, `level`, `channel`, `timestamp`, `request_id`, `correlation_id`, `trace_id`, `span_id`, `method`, `path`, `context` e `extra`.
 - `request_id` e `correlation_id` são gerados no BFF (ou herdados de `X-Request-Id`/`X-Correlation-Id`) e propagados nas chamadas internas. Os serviços de domínio reutilizam esses headers.
 - O middleware de observabilidade inicia um span por requisição, propaga `traceparent` para os serviços internos e registra `trace_id`/`span_id` em cada log.
+- Workers registram `Outbox events relayed`, `Team events consumed` e `Match events consumed` quando processam eventos. Fora de requisições HTTP, `request_id`, `correlation_id` e `trace_id` ficam nulos.
 - Labels no Loki: `service_name`, `service_namespace`, `deployment_environment`.
+- O dashboard `Futsal - Logs` atualiza automaticamente a cada 10s; use `Serviço = All` e o intervalo `Last 1 hour` para ver todos os serviços.
 - Retenção: 7 dias.
 
 Abrir: `http://localhost:3000` e selecionar o dashboard `Futsal - Logs`.
